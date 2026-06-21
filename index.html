@@ -15,15 +15,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#141118;
-    --bg-soft:#1c1822;
-    --mark:#c98bff;
-    --mark-dim:#7d5a9e;
-    --ink:#ece7f0;
-    --ink-soft:#a99fb5;
-    --ink-faint:#6f6678;
-    --line:rgba(201,139,255,0.12);
-    --display:"Space Grotesk",system-ui,sans-serif;
+    --bg:#0f0f1a;
+    --bg-soft:#1a1a2e;
+    --mark:#a48fff;
+    --mark-dim:#6e56cf;
+    --ink:#e2e2f5;
+    --ink-soft:#a0a0c0;
+    --ink-faint:#6f6f96;
+    --line:rgba(164,143,255,0.14);
+    --display:"Space Grotesk",Inter,system-ui,sans-serif;
     --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -75,8 +75,8 @@
   .dah{width:108px;animation:key .5s ease-out .55s forwards}
   @keyframes key{
     0%{opacity:0;transform:scale(0.72)}
-    60%{opacity:1;transform:scale(1.04);box-shadow:0 0 20px 1px rgba(201,139,255,0.35)}
-    100%{opacity:1;transform:scale(1);box-shadow:0 0 0 0 rgba(201,139,255,0)}
+    60%{opacity:1;transform:scale(1.04);box-shadow:0 0 20px 1px rgba(164,143,255,0.40)}
+    100%{opacity:1;transform:scale(1);box-shadow:0 0 0 0 rgba(164,143,255,0)}
   }
   .key-label{display:none}
   @keyframes fade{to{opacity:1}}
@@ -102,14 +102,14 @@
   .cta-row{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:2.8rem}
   .cta{
     display:inline-flex;align-items:center;gap:0.5rem;
-    background:var(--mark);color:#1a1020;
+    background:var(--mark);color:#0f0f1a;
     font-family:var(--display);font-weight:500;font-size:1.05rem;
     text-decoration:none;padding:0.8rem 1.4rem;border-radius:9px;
     transition:transform .18s ease,background .18s ease,box-shadow .18s ease;
   }
   .cta:hover,.cta:focus-visible{
-    background:#d9a6ff;transform:translateY(-1px);
-    box-shadow:0 6px 24px -8px rgba(201,139,255,0.6);outline:none;
+    background:#b9a8ff;transform:translateY(-1px);
+    box-shadow:0 6px 24px -8px rgba(164,143,255,0.55);outline:none;
   }
   .cta:focus-visible{outline:2px solid var(--mark);outline-offset:3px}
   .cta span{transition:transform .18s ease}
