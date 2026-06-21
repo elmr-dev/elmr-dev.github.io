@@ -7,7 +7,10 @@ type Feature = { label: string; desc: string };
 const WHY_FEATURES: Feature[] = [
   { label: "cross-platform", desc: "runs where you do — not just on one OS" },
   { label: "in the open", desc: "source, models, and method all public" },
-  { label: "built to last", desc: "modern foundations, not another abandoned demo" },
+  {
+    label: "built to last",
+    desc: "modern foundations, not another abandoned demo",
+  },
 ];
 
 export function why(): string {

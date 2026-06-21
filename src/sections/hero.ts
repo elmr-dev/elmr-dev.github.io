@@ -7,7 +7,7 @@ export function hero(): string {
     <section class="hero">
       <p class="eyebrow">&mdash; modern ham radio software, in the open</p>
 
-      <h1 class="hero-title">Ham radio software <span class="hl">worth using</span>.</h1>
+      <h1 class="hero-title">Ham radio software, <span class="hl"> rebuilt for everywhere</span>.</h1>
 
       <p class="lede">Modern, cross-platform, built to last &mdash; starting with the CW decoder you can run right now.</p>
 
