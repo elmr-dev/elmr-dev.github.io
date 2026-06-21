@@ -5,6 +5,7 @@ import { why, how } from "./sections/prose";
 import { projects } from "./sections/projects";
 import { join } from "./sections/join";
 import { initGrid } from "./grid/grid";
+import { initTheme } from "./theme";
 
 // A full-width band with a tinted background; inner content stays column-width.
 const band = (inner: string, variant = "") =>
@@ -32,3 +33,5 @@ const canvas = document.getElementById("grid-bg");
 if (canvas instanceof HTMLCanvasElement) {
   initGrid(canvas);
 }
+
+initTheme();
