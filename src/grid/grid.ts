@@ -2,20 +2,56 @@
 // - faint graph-paper grid (light theme)
 // - a highlight cell that snaps to follow the cursor
 // - a click sends an expanding CW "wavefront" ripple from the cell
+// - a faint world coastline map sits behind the hero, under the grid
 //
 // Honors prefers-reduced-motion: draws the static grid only, no cursor cell, no ripple.
+
+import { COASTLINE } from "./coastline";
 
 const CELL = 12; // px grid cell size — fine graph paper, half-density (crew-style)
 
 type RGB = [number, number, number];
 
-// Cosmic Night light tokens (kept in sync with style.css)
-const COLORS = {
-  line: "rgba(110, 86, 207, 0.05)", // faint violet grid lines (lighter for fine grid)
-  cellFill: "rgba(110, 86, 207, 0.10)", // cursor cell tint
-  cellStroke: "rgba(110, 86, 207, 0.35)", // cursor cell outline
-  ripple: [110, 86, 207] as RGB, // primary, for wavefront rings
-};
+// Canvas colors are read from CSS custom properties so the backdrop tracks the
+// active theme (light/dark). Re-read on theme change via readColors().
+interface CanvasColors {
+  line: string;
+  cellFill: string;
+  cellStroke: string;
+  ripple: RGB;
+  map: RGB;
+  mapAlpha: number;
+}
+
+function rgbVar(styles: CSSStyleDeclaration, name: string, fallback: RGB): RGB {
+  const v = styles.getPropertyValue(name).trim(); // e.g. "110, 86, 207"
+  if (!v) return fallback;
+  const parts = v.split(",").map((n) => parseFloat(n));
+  if (parts.length === 3 && parts.every((n) => !isNaN(n))) {
+    return [parts[0], parts[1], parts[2]];
+  }
+  return fallback;
+}
+
+function numVar(styles: CSSStyleDeclaration, name: string, fallback: number): number {
+  const v = parseFloat(styles.getPropertyValue(name));
+  return isNaN(v) ? fallback : v;
+}
+
+function readColors(): CanvasColors {
+  const s = getComputedStyle(document.documentElement);
+  const line = rgbVar(s, "--grid-line", [110, 86, 207]);
+  const lineA = numVar(s, "--grid-line-alpha", 0.05);
+  const cell = rgbVar(s, "--grid-cell", [110, 86, 207]);
+  return {
+    line: `rgba(${line[0]}, ${line[1]}, ${line[2]}, ${lineA})`,
+    cellFill: `rgba(${cell[0]}, ${cell[1]}, ${cell[2]}, 0.10)`,
+    cellStroke: `rgba(${cell[0]}, ${cell[1]}, ${cell[2]}, 0.35)`,
+    ripple: rgbVar(s, "--grid-ripple", [110, 86, 207]),
+    map: rgbVar(s, "--grid-map", [120, 120, 140]),
+    mapAlpha: numVar(s, "--grid-map-alpha", 0.26),
+  };
+}
 
 interface Ripple {
   cx: number;
@@ -40,6 +76,7 @@ export function initGrid(canvas: HTMLCanvasElement): void {
   let cellX = -1;
   let cellY = -1;
   const ripples: Ripple[] = [];
+  let colors = readColors(); // re-read on theme change
 
   function resize(): void {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -54,7 +91,7 @@ export function initGrid(canvas: HTMLCanvasElement): void {
 
   function drawGridLines(): void {
     ctx!.lineWidth = 1;
-    ctx!.strokeStyle = COLORS.line;
+    ctx!.strokeStyle = colors.line;
     ctx!.beginPath();
     for (let x = 0; x <= w; x += CELL) {
       ctx!.moveTo(x + 0.5, 0);
@@ -67,14 +104,70 @@ export function initGrid(canvas: HTMLCanvasElement): void {
     ctx!.stroke();
   }
 
+  // Faint world coastline behind the hero. Equirectangular projection.
+  // On wide screens it spans a bit past the viewport; on narrow (mobile)
+  // screens it keeps real proportions by enforcing a minimum width and
+  // letting the map bleed off both edges rather than crushing the globe.
+  function drawMap(): void {
+    const [r, g, b] = colors.map;
+    const baseAlpha = colors.mapAlpha;
+    // Keep continents readable: never let the world get narrower than ~900px.
+    // On desktop this is w * 1.25; on mobile the max() floor kicks in so the
+    // map bleeds off-edge (intentional) instead of compressing horizontally.
+    const mapW = Math.max(w * 1.25, 900);
+    const mapH = mapW / 2; // equirectangular is 2:1
+    const offsetX = (w - mapW) / 2; // centered (negative on mobile = bleeds both sides)
+    // Vertically place the map across the hero region.
+    const offsetY = Math.min(h * 0.16, 120);
+    // Fade band: full strength up top, gone by the bottom of the projection.
+    const fadeStart = mapH * 0.5;
+    const fadeEnd = mapH * 0.92;
+
+    const project = (lon: number, lat: number): [number, number] => [
+      offsetX + ((lon + 180) / 360) * mapW,
+      offsetY + ((90 - lat) / 180) * mapH,
+    ];
+
+    ctx!.lineWidth = 1;
+    ctx!.lineJoin = "round";
+    for (const seg of COASTLINE) {
+      // per-segment vertical fade based on its midpoint y
+      const midY = offsetY + ((90 - seg[Math.floor(seg.length / 2)][1]) / 180) * mapH;
+      let a = baseAlpha;
+      if (midY > fadeStart) {
+        a *= Math.max(0, 1 - (midY - fadeStart) / (fadeEnd - fadeStart));
+      }
+      if (a < 0.01) continue;
+      ctx!.strokeStyle = `rgba(${r},${g},${b},${a})`;
+      ctx!.beginPath();
+      let started = false;
+      for (const [lon, lat] of seg) {
+        const [px, py] = project(lon, lat);
+        if (!started) {
+          ctx!.moveTo(px, py);
+          started = true;
+        } else {
+          ctx!.lineTo(px, py);
+        }
+      }
+      ctx!.stroke();
+    }
+  }
+
+  // Static backdrop = map first (underneath), then grid lines on top.
+  function drawBackground(): void {
+    drawMap();
+    drawGridLines();
+  }
+
   function drawCursorCell(): void {
     if (cellX < 0 || cellY < 0) return;
     const px = cellX * CELL;
     const py = cellY * CELL;
-    ctx!.fillStyle = COLORS.cellFill;
+    ctx!.fillStyle = colors.cellFill;
     ctx!.fillRect(px, py, CELL, CELL);
     ctx!.lineWidth = 1;
-    ctx!.strokeStyle = COLORS.cellStroke;
+    ctx!.strokeStyle = colors.cellStroke;
     ctx!.strokeRect(px + 0.5, py + 0.5, CELL - 1, CELL - 1);
   }
 
@@ -111,7 +204,7 @@ export function initGrid(canvas: HTMLCanvasElement): void {
   function drawRipples(now: number): void {
     const DURATION = 4200; // ms — slow, unhurried glide outward
     const maxR = Math.hypot(w, h);
-    const rgb = COLORS.ripple;
+    const rgb = colors.ripple;
 
     for (let i = ripples.length - 1; i >= 0; i--) {
       const rip = ripples[i];
@@ -135,7 +228,7 @@ export function initGrid(canvas: HTMLCanvasElement): void {
   let rafId = 0;
   function frame(now: number): void {
     ctx!.clearRect(0, 0, w, h);
-    drawGridLines();
+    drawBackground();
     if (!reduceMotion) {
       drawCursorCell();
       drawRipples(now);
@@ -155,14 +248,24 @@ export function initGrid(canvas: HTMLCanvasElement): void {
   // Static first paint
   resize();
   ctx.clearRect(0, 0, w, h);
-  drawGridLines();
+  drawBackground();
+
+  // Re-read palette and repaint when the theme switches (light <-> dark).
+  window.addEventListener("themechange", () => {
+    colors = readColors();
+    if (rafId === 0) {
+      ctx.clearRect(0, 0, w, h);
+      drawBackground();
+      drawCursorCell();
+    }
+  });
 
   if (reduceMotion) return; // no interactivity under reduced motion
 
   window.addEventListener("resize", () => {
     resize();
     ctx.clearRect(0, 0, w, h);
-    drawGridLines();
+    drawBackground();
     drawCursorCell();
   });
 
@@ -177,7 +280,7 @@ export function initGrid(canvas: HTMLCanvasElement): void {
         // redraw a single idle frame to move the cell
         if (rafId === 0) {
           ctx.clearRect(0, 0, w, h);
-          drawGridLines();
+          drawBackground();
           drawCursorCell();
           drawRipples(performance.now());
         }
@@ -191,7 +294,7 @@ export function initGrid(canvas: HTMLCanvasElement): void {
     cellY = -1;
     if (rafId === 0) {
       ctx.clearRect(0, 0, w, h);
-      drawGridLines();
+      drawBackground();
     }
   });
 
