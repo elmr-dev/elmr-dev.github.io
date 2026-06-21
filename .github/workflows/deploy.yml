@@ -41,3 +41,43 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  notify:
+    needs: deploy
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Notify Discord
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_DEPLOY_WEBHOOK }}
+          RESULT: ${{ needs.deploy.result }}
+        run: |
+          if [ -z "$WEBHOOK" ]; then
+            echo "DISCORD_DEPLOY_WEBHOOK not set — skipping notification."
+            exit 0
+          fi
+          COMMIT_MSG=$(git log -1 --pretty=%s | sed 's/"/\\"/g')
+          if [ "$RESULT" = "success" ]; then
+            COLOR=3066993
+            TITLE="Deployed to elmr.dev"
+            DESC="[\`${GITHUB_SHA:0:7}\`](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}) on the air — https://elmr.dev"
+          else
+            COLOR=15158332
+            TITLE="Deploy failed"
+            DESC="[\`${GITHUB_SHA:0:7}\`](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}) didn't make it — [run log](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})"
+          fi
+          curl -fsS -X POST "$WEBHOOK" \
+            -H "Content-Type: application/json" \
+            -d @- <<JSON
+          {
+            "username": "elmr CI",
+            "embeds": [{
+              "title": "${TITLE}",
+              "description": "${DESC}",
+              "color": ${COLOR},
+              "fields": [{ "name": "commit", "value": "${COMMIT_MSG}" }],
+              "footer": { "text": "${GITHUB_REF_NAME} · by ${GITHUB_ACTOR}" }
+            }]
+          }
+          JSON
