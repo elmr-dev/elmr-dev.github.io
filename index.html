@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>elmr.dev — ham radio software worth using</title>
+<meta name="description" content="Elmr builds modern, cross-platform ham radio software, in the open. Morse is the first thing.">
+<meta property="og:title" content="elmr.dev">
+<meta property="og:description" content="Ham radio software worth using — modern, cross-platform, built in the open.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://elmr.dev">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Martian+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f0f1a;
+    --bg-soft:#1a1a2e;
+    --mark:#a48fff;
+    --mark-dim:#6e56cf;
+    --ink:#e2e2f5;
+    --ink-soft:#a0a0c0;
+    --ink-faint:#6f6f96;
+    --line:rgba(164,143,255,0.14);
+    --display:"Space Grotesk",Inter,system-ui,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--display);
+    line-height:1.6;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  a{color:inherit}
+  .wrap{
+    flex:1;
+    width:100%;
+    max-width:760px;
+    margin:0 auto;
+    padding:clamp(2rem,6vw,5rem) clamp(1.5rem,5vw,2.5rem);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+
+  /* ---- signature: the dit-dah, keyed on load ---- */
+  .header{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:2.4rem}
+  .mark{display:flex;align-items:center;gap:18px;padding:4px 2px}
+  .links{display:flex;align-items:center;gap:0.4rem;opacity:0;animation:fade .8s ease-out .9s forwards}
+  .iconlink{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:40px;height:40px;color:var(--ink-soft);
+    border:1px solid var(--line);border-radius:8px;
+    transition:color .2s ease,border-color .2s ease,background .2s ease;
+  }
+  .iconlink:hover,.iconlink:focus-visible{
+    color:var(--mark);border-color:var(--mark-dim);
+    background:var(--bg-soft);outline:none;
+  }
+  .iconlink:focus-visible{outline:2px solid var(--mark);outline-offset:3px}
+  .iconlink svg{flex-shrink:0}
+  .dit,.dah{
+    height:34px;background:var(--mark);border-radius:17px;
+    opacity:0;transform:scale(0.72);transform-origin:center;
+  }
+  .dit{width:34px;animation:key .5s ease-out .2s forwards}
+  .dah{width:108px;animation:key .5s ease-out .55s forwards}
+  @keyframes key{
+    0%{opacity:0;transform:scale(0.72)}
+    60%{opacity:1;transform:scale(1.04);box-shadow:0 0 20px 1px rgba(164,143,255,0.40)}
+    100%{opacity:1;transform:scale(1);box-shadow:0 0 0 0 rgba(164,143,255,0)}
+  }
+  .key-label{display:none}
+  @keyframes fade{to{opacity:1}}
+
+  h1{
+    font-family:"Martian Mono",var(--mono);font-weight:600;
+    font-size:clamp(2.3rem,8vw,4rem);
+    letter-spacing:-0.07em;line-height:1.02;margin-bottom:1.4rem;
+  }
+  h1 .tld{color:var(--mark-dim);font-weight:500}
+  .lede{
+    font-size:clamp(1.15rem,3.2vw,1.5rem);
+    color:var(--ink-soft);font-weight:400;
+    max-width:34ch;margin-bottom:2.8rem;
+  }
+  .lede strong{color:var(--ink);font-weight:500}
+
+  .body-copy{max-width:54ch;color:var(--ink-soft);font-size:1.02rem;margin-bottom:3rem}
+  .body-copy p+p{margin-top:1rem}
+  .body-copy .em{color:var(--mark);font-weight:500;font-style:normal}
+
+  /* ---- primary CTA ---- */
+  .cta-row{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:2.8rem}
+  .cta{
+    display:inline-flex;align-items:center;gap:0.5rem;
+    background:var(--mark);color:#0f0f1a;
+    font-family:var(--display);font-weight:500;font-size:1.05rem;
+    text-decoration:none;padding:0.8rem 1.4rem;border-radius:9px;
+    transition:transform .18s ease,background .18s ease,box-shadow .18s ease;
+  }
+  .cta:hover,.cta:focus-visible{
+    background:#b9a8ff;transform:translateY(-1px);
+    box-shadow:0 6px 24px -8px rgba(164,143,255,0.55);outline:none;
+  }
+  .cta:focus-visible{outline:2px solid var(--mark);outline-offset:3px}
+  .cta span{transition:transform .18s ease}
+  .cta:hover span{transform:translateX(3px)}
+  .cta-note{font-family:var(--mono);font-size:0.78rem;color:var(--ink-faint);letter-spacing:0.02em}
+
+  /* ---- contributor invitation ---- */
+  .join{margin-top:2.6rem;padding-top:1.8rem;border-top:1px solid var(--line);max-width:54ch}
+  .join p{color:var(--ink-soft);font-size:1rem;margin-bottom:1.1rem}
+  .join-link{
+    display:inline-flex;align-items:center;gap:0.55rem;
+    color:var(--mark);text-decoration:none;font-weight:500;
+    border:1px solid var(--mark-dim);border-radius:8px;
+    padding:0.6rem 1rem;transition:background .2s ease,border-color .2s ease;
+  }
+  .join-link:hover,.join-link:focus-visible{background:var(--bg-soft);border-color:var(--mark);outline:none}
+  .join-link:focus-visible{outline:2px solid var(--mark);outline-offset:3px}
+  .join-link svg{flex-shrink:0}
+
+  /* ---- projects ---- */
+  .projects{border-top:1px solid var(--line);padding-top:1.8rem}
+  .projects-label{
+    font-family:var(--mono);font-size:0.7rem;letter-spacing:0.28em;
+    text-transform:uppercase;color:var(--ink-faint);margin-bottom:1.1rem;
+  }
+  .proj{
+    display:flex;align-items:baseline;gap:0.9rem;
+    text-decoration:none;padding:0.85rem 0;
+    border-bottom:1px solid var(--line);
+    transition:padding-left .25s ease;
+  }
+  .proj:hover,.proj:focus-visible{padding-left:0.6rem;outline:none}
+  .proj:focus-visible{outline:2px solid var(--mark);outline-offset:4px;border-radius:2px}
+  .proj-cw{
+    font-family:var(--mono);color:var(--mark-dim);font-size:0.95rem;
+    flex-shrink:0;width:3.2em;letter-spacing:0.05em;
+    transition:color .25s ease;
+  }
+  .proj:hover .proj-cw{color:var(--mark)}
+  .proj-name{font-family:var(--display);font-weight:500;font-size:1.18rem}
+  .proj-desc{color:var(--ink-faint);font-size:0.92rem;margin-left:auto;text-align:right}
+  .proj-arrow{color:var(--mark-dim);transition:transform .25s ease,color .25s ease;flex-shrink:0}
+  .proj:hover .proj-arrow{transform:translateX(4px);color:var(--mark)}
+  .proj.soon{cursor:default;opacity:0.55}
+  .proj.soon:hover{padding-left:0}
+  .proj.soon .proj-desc{font-style:italic}
+
+  /* ---- responsive ---- */
+  @media (max-width:600px){
+    .wrap{justify-content:flex-start;padding-top:2.5rem;padding-bottom:3rem}
+    .header{margin-bottom:2rem}
+    .dit,.dah{height:26px}
+    .dit{width:26px}
+    .dah{width:82px}
+    .mark{gap:14px}
+    .lede{font-size:1.2rem;max-width:none;margin-bottom:2rem}
+    .body-copy{font-size:1rem;margin-bottom:2.4rem}
+
+    .cta-row{flex-direction:column;align-items:stretch;gap:0.7rem;margin-bottom:2.4rem}
+    .cta{width:100%;justify-content:center;padding:0.95rem 1.4rem;font-size:1.08rem}
+    .cta-note{text-align:center}
+
+    .join{margin-top:2.2rem}
+    .join-link{width:100%;justify-content:center;padding:0.85rem 1rem}
+
+    .proj{
+      flex-wrap:wrap;gap:0.3rem 0.7rem;padding:1rem 1.1rem;
+      border:1px solid var(--line);border-bottom:1px solid var(--line);
+      border-radius:10px;background:var(--bg-soft);
+      margin-bottom:0.7rem;align-items:center;
+    }
+    .proj:last-child{margin-bottom:0}
+    .proj-cw{width:auto;font-size:0.85rem;order:1}
+    .proj-name{font-size:1.15rem;order:2}
+    .proj-arrow{order:3;margin-left:auto;color:var(--mark);font-size:1.2rem}
+    .proj-desc{margin-left:0;width:100%;text-align:left;font-size:0.9rem;order:4}
+    .proj:hover,.proj:focus-visible{padding-left:1.1rem}
+    .proj:active{background:var(--line)}
+    .proj.soon{background:transparent;border-style:dashed;transition:none}
+    .proj.soon:hover,.proj.soon:focus-visible,.proj.soon:active{padding-left:1.1rem;background:transparent}
+  }
+
+  @media (max-width:380px){
+    h1{font-size:2.3rem}
+    .iconlink{width:38px;height:38px}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .dit,.dah,.key-label,.links{animation:none;opacity:1;transform:none;box-shadow:none}
+    .cta:hover{transform:none}
+  }
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="header">
+      <div class="mark" aria-label="Morse code dit dah, the letter A">
+        <span class="dit" aria-hidden="true"></span>
+        <span class="dah" aria-hidden="true"></span>
+      </div>
+      <div class="links">
+        <a class="iconlink" href="https://github.com/elmr-dev" aria-label="Elmr on GitHub">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.417-1.305.76-1.605-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.51 11.51 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12Z"/></svg>
+        </a>
+        <a class="iconlink" href="https://discord.elmr.dev" aria-label="Join the Elmr Discord">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M20.317 4.369a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037 13.78 13.78 0 0 0-.608 1.25 18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.2 14.2 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.056c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.028ZM8.02 15.331c-1.183 0-2.157-1.086-2.157-2.42 0-1.332.955-2.418 2.157-2.418 1.21 0 2.176 1.095 2.157 2.419 0 1.333-.956 2.419-2.157 2.419Zm7.975 0c-1.183 0-2.157-1.086-2.157-2.42 0-1.332.955-2.418 2.157-2.418 1.21 0 2.176 1.095 2.157 2.419 0 1.333-.946 2.419-2.157 2.419Z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <h1>elmr<span class="tld">.dev</span></h1>
+
+    <p class="lede">Ham radio software <strong>worth using</strong> &mdash; modern, cross-platform, built to last.</p>
+
+    <div class="cta-row">
+      <a class="cta" href="https://morse.elmr.dev">Try the decoder <span aria-hidden="true">&rarr;</span></a>
+      <span class="cta-note">no install &middot; runs in your browser</span>
+    </div>
+
+    <div class="body-copy">
+      <p>Ham software has solved a lot, but most of it stayed on one platform while everything else moved on. We're rethinking the tools people use every day, out in the open.</p>
+      <p>We build AI-assisted, as a small team that ships. The packages we make, how we make them, what we figure out along the way &mdash; model development, working code, tutorials &mdash; shared as we go, so the next person has a shorter path than we did.</p>
+      <p><span class="em">An Elmer brings people along</span> &mdash; that's the whole point.</p>
+    </div>
+
+    <nav class="projects" aria-label="Projects">
+      <p class="projects-label">What we're building</p>
+
+      <a class="proj" href="https://morse.elmr.dev">
+        <span class="proj-cw" aria-hidden="true">&middot;&middot;&middot;&middot;</span>
+        <span class="proj-name">Morse</span>
+        <span class="proj-desc">browser CW decoder &mdash; pull it out of the noise floor</span>
+        <span class="proj-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+
+      <div class="proj soon">
+        <span class="proj-cw" aria-hidden="true">&middot;&middot;&middot;</span>
+        <span class="proj-name">More</span>
+        <span class="proj-desc">earned by the apps, not announced before them</span>
+      </div>
+    </nav>
+
+    <div class="join">
+      <p>Tired of the same software too? If you write code, train models, design, or just have strong opinions about how this should work &mdash; come build with us.</p>
+      <a class="join-link" href="https://discord.elmr.dev">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M20.317 4.369a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037 13.78 13.78 0 0 0-.608 1.25 18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.2 14.2 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.056c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.028ZM8.02 15.331c-1.183 0-2.157-1.086-2.157-2.42 0-1.332.955-2.418 2.157-2.418 1.21 0 2.176 1.095 2.157 2.419 0 1.333-.956 2.419-2.157 2.419Zm7.975 0c-1.183 0-2.157-1.086-2.157-2.42 0-1.332.955-2.418 2.157-2.418 1.21 0 2.176 1.095 2.157 2.419 0 1.333-.946 2.419-2.157 2.419Z"/></svg>
+        Start in the Discord
+      </a>
+    </div>
+  </main>
+</body>
+</html>
