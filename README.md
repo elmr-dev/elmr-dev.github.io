@@ -1,6 +1,6 @@
 # elmr.dev
 
-The org landing page for [Elmr](https://github.com/elmr-dev) — ham radio software worth using.
+The org landing page for [Elmr](https://github.com/elmr-dev) — Ham radio software, rebuilt for everywhere.
 
 Vite + vanilla TypeScript, built to static HTML/CSS/JS and deployed to GitHub Pages. Light theme (Cosmic Night). Interactive graph-paper background with a cursor-follow cell and a CW-wavefront click ripple.
 
