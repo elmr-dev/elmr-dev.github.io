@@ -8,26 +8,47 @@
       name="description"
       content="Elmr builds modern, cross-platform ham radio software, in the open. Morse is the first thing."
     />
-    <meta property="og:title" content="elmr.dev" />
+    <meta property="og:image" content="https://elmr.dev/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta
-      property="og:description"
+      property="og:image:alt"
+      content="elmr — ham radio software, rebuilt for everywhere."
+    />
+    <meta property="og:site_name" content="elmr" />
+    <meta property="og:locale" content="en_US" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="elmr.dev" />
+    <meta
+      name="twitter:description"
       content="Ham radio software, rebuilt for everywhere — modern, cross-platform, built in the open."
     />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://elmr.dev" />
+    <meta name="twitter:image" content="https://elmr.dev/og.png" />
+    <meta
+      name="twitter:image:alt"
+      content="elmr — ham radio software, rebuilt for everywhere."
+    />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" content="#f5f5ff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0f0f1a" media="(prefers-color-scheme: dark)" />
+    <meta
+      name="theme-color"
+      content="#f5f5ff"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#0f0f1a"
+      media="(prefers-color-scheme: dark)"
+    />
     <script>
       // Apply saved/system theme before paint to avoid a flash of the wrong theme.
-      (function () {
+      (() => {
         try {
-          var saved = localStorage.getItem("elmr-theme");
-          var dark = saved
-            ? saved === "dark"
-            : window.matchMedia("(prefers-color-scheme: dark)").matches;
+          const saved = localStorage.getItem("elmr-theme");
+          // Default to dark; honor an explicit saved choice if present.
+          const dark = saved ? saved === "dark" : true;
           if (dark) document.documentElement.setAttribute("data-theme", "dark");
-        } catch (e) {}
+        } catch {}
       })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
